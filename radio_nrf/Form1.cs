@@ -55,7 +55,7 @@ namespace radio_nrf
             // Привлечение делегата на потоке UI, и отправка данных, которые
             // были приняты привлеченным методом.
             // ---- Метод "si_DataReceived" будет выполнен в потоке UI,
-            // который позволит заполнить текстовое поле TextBox.
+            // который позволит заполнить текстовое поле TextBox.sss
             BeginInvoke(new SetTextDeleg(si_DataReceived), new object[] { data });
         }
 
