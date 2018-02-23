@@ -6,48 +6,65 @@ using System.Threading;
 
 namespace radio_nrf
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
 
         private static Encoding enc8 = Encoding.UTF8;
         private delegate void SetTextDeleg(string text);
-        string data;
+        private string data;
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
             // получаем список доступных портов
             string[] ports = SerialPort.GetPortNames();
             // выводим список портов
             foreach (string p in ports)
-                comboBox1.Items.Add(p);
+                combo_port.Items.Add(p);
+            if (combo_port.Items.Count == 0)
+                MessageBox.Show("Устройств не найдено!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            else
+                combo_port.SelectedIndex = 0;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void MainFormFormClosing(object sender, FormClosingEventArgs e)
         {
-            if(!serialPort1.IsOpen)
-                serialPort1.Open();
-            //Открываем порт.
-            serialPort1.Write("1");
+            serialPort1.Close();
+        }
+
+        //-----Отправка сообщения-----
+
+        private void ButtonSendClick(object sender, EventArgs e)
+        {
+            Send_Mail();
             //Thread.Sleep(500);
             //serialPort1.Close();
         }
 
-        private void si_DataReceived(string data)
+        private void MailKeyDown(object sender, KeyEventArgs e)
         {
-            richTextBox1.Text += data;
+            if (e.KeyCode == Keys.Enter)
+            {
+                Send_Mail();
+                button_send.Focus();
+            }
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void Send_Mail()
         {
-            serialPort1.PortName = comboBox1.SelectedItem.ToString(); //Указываем наш порт
-            serialPort1.BaudRate = 9600; //указываем скорость.
-            serialPort1.DataBits = 8;
-            serialPort1.Parity = Parity.None;
-            serialPort1.Handshake = Handshake.None;
+            if (mail.Text != "")
+            {
+                serialPort1.Write(mail.Text);
+                richTextBox1.Clear();
+            }
+            mail.Clear();
         }
+        
+        //-----------------------------
 
-        private void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        //-----Получение сообщения-----
+
+        private void SerialPortDataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             Thread.Sleep(50);
             data = serialPort1.ReadExisting();
@@ -56,12 +73,34 @@ namespace radio_nrf
             // были приняты привлеченным методом.
             // ---- Метод "si_DataReceived" будет выполнен в потоке UI,
             // который позволит заполнить текстовое поле TextBox.sss
-            BeginInvoke(new SetTextDeleg(si_DataReceived), new object[] { data });
+            BeginInvoke(new SetTextDeleg(SiDataReceived), new object[] { data });
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private void SiDataReceived(string data)
         {
-            serialPort1.Close();
+            richTextBox1.Text += data;
+        }
+
+        //-----------------------------
+
+        private void PortSelection(object sender, EventArgs e)
+        {
+            if (serialPort1.IsOpen)
+                serialPort1.Close();
+            mail.Clear();
+            richTextBox1.Clear();
+            serialPort1.PortName = combo_port.SelectedItem.ToString(); //Указываем наш порт
+            serialPort1.BaudRate = 9600; //указываем скорость.
+            serialPort1.DataBits = 8;
+            serialPort1.Parity = Parity.None;
+            serialPort1.Handshake = Handshake.None;
+            serialPort1.Open();
+        }
+
+        private void ButtonClearClick(object sender, EventArgs e)
+        {
+            richTextBox1.Clear();
+            mail.Clear();
         }
     }
 }

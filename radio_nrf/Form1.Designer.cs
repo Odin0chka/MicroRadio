@@ -1,6 +1,6 @@
 ﻿namespace radio_nrf
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         /// Обязательная переменная конструктора.
@@ -29,84 +29,67 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.button1 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.listBox1 = new System.Windows.Forms.ListBox();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.button_send = new System.Windows.Forms.Button();
+            this.mail = new System.Windows.Forms.TextBox();
+            this.combo_port = new System.Windows.Forms.ComboBox();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.button_clear = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
-            // button1
+            // button_send
             // 
-            this.button1.Location = new System.Drawing.Point(322, 241);
-            this.button1.Margin = new System.Windows.Forms.Padding(4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(100, 28);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "Send";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button_send.Location = new System.Drawing.Point(322, 241);
+            this.button_send.Margin = new System.Windows.Forms.Padding(4);
+            this.button_send.Name = "button_send";
+            this.button_send.Size = new System.Drawing.Size(100, 28);
+            this.button_send.TabIndex = 0;
+            this.button_send.Text = "Send";
+            this.button_send.UseVisualStyleBackColor = true;
+            this.button_send.Click += new System.EventHandler(this.ButtonSendClick);
             // 
-            // textBox1
+            // mail
             // 
-            this.textBox1.Location = new System.Drawing.Point(7, 244);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(4);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(309, 22);
-            this.textBox1.TabIndex = 1;
+            this.mail.Location = new System.Drawing.Point(7, 244);
+            this.mail.Margin = new System.Windows.Forms.Padding(4);
+            this.mail.Name = "mail";
+            this.mail.Size = new System.Drawing.Size(309, 22);
+            this.mail.TabIndex = 1;
+            this.mail.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MailKeyDown);
             // 
-            // textBox2
+            // combo_port
             // 
-            this.textBox2.Location = new System.Drawing.Point(447, 295);
-            this.textBox2.Margin = new System.Windows.Forms.Padding(4);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(520, 22);
-            this.textBox2.TabIndex = 2;
-            // 
-            // listBox1
-            // 
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.ItemHeight = 16;
-            this.listBox1.Location = new System.Drawing.Point(42, 402);
-            this.listBox1.Margin = new System.Windows.Forms.Padding(4);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(280, 116);
-            this.listBox1.TabIndex = 3;
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(7, 45);
-            this.comboBox1.Margin = new System.Windows.Forms.Padding(4);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(101, 24);
-            this.comboBox1.TabIndex = 4;
-            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+            this.combo_port.FormattingEnabled = true;
+            this.combo_port.Location = new System.Drawing.Point(7, 45);
+            this.combo_port.Margin = new System.Windows.Forms.Padding(4);
+            this.combo_port.Name = "combo_port";
+            this.combo_port.Size = new System.Drawing.Size(101, 24);
+            this.combo_port.TabIndex = 4;
+            this.combo_port.SelectedIndexChanged += new System.EventHandler(this.PortSelection);
             // 
             // richTextBox1
             // 
             this.richTextBox1.Location = new System.Drawing.Point(6, 21);
             this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.ReadOnly = true;
             this.richTextBox1.Size = new System.Drawing.Size(417, 213);
             this.richTextBox1.TabIndex = 5;
             this.richTextBox1.Text = "";
             // 
             // serialPort1
             // 
-            this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
+            this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.SerialPortDataReceived);
             // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.richTextBox1);
-            this.groupBox1.Controls.Add(this.textBox1);
-            this.groupBox1.Controls.Add(this.button1);
+            this.groupBox1.Controls.Add(this.mail);
+            this.groupBox1.Controls.Add(this.button_send);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(429, 276);
@@ -116,14 +99,26 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.button_clear);
             this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Controls.Add(this.comboBox1);
+            this.groupBox2.Controls.Add(this.combo_port);
             this.groupBox2.Location = new System.Drawing.Point(447, 12);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(115, 276);
             this.groupBox2.TabIndex = 7;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Option";
+            // 
+            // button_clear
+            // 
+            this.button_clear.Location = new System.Drawing.Point(7, 241);
+            this.button_clear.Margin = new System.Windows.Forms.Padding(4);
+            this.button_clear.Name = "button_clear";
+            this.button_clear.Size = new System.Drawing.Size(101, 28);
+            this.button_clear.TabIndex = 6;
+            this.button_clear.Text = "Clear";
+            this.button_clear.UseVisualStyleBackColor = true;
+            this.button_clear.Click += new System.EventHandler(this.ButtonClearClick);
             // 
             // label1
             // 
@@ -134,40 +129,37 @@
             this.label1.TabIndex = 5;
             this.label1.Text = "Port";
             // 
-            // Form1
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(999, 630);
+            this.ClientSize = new System.Drawing.Size(576, 300);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.listBox1);
-            this.Controls.Add(this.textBox2);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "Form1";
-            this.Text = "Form1";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.Name = "MainForm";
+            this.Text = "Is my PROJECT";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainFormFormClosing);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.ListBox listBox1;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Button button_send;
+        private System.Windows.Forms.TextBox mail;
+        private System.Windows.Forms.ComboBox combo_port;
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.IO.Ports.SerialPort serialPort1;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button button_clear;
     }
 }
 
