@@ -8,28 +8,36 @@ namespace radio_nrf
 {
     public partial class MainForm : Form
     {
-
-        private static Encoding enc8 = Encoding.UTF8;
         private delegate void SetTextDeleg(string text);
-        private string data;
+        private string _data;
 
         public MainForm()
         {
             InitializeComponent();
             // получаем список доступных портов
             string[] ports = SerialPort.GetPortNames();
+            if (ports.Length < 2)
+            {
+                MessageBox.Show("Устройств не найдено!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                groupBox1.Enabled = false;
+                groupBox2.Enabled = false;
+                Close();
+                return;
+            }
             // выводим список портов
             foreach (string p in ports)
-                combo_port.Items.Add(p);
-            if (combo_port.Items.Count == 0)
-                MessageBox.Show("Устройств не найдено!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            else
-                combo_port.SelectedIndex = 0;
+            {
+                combo_port_send.Items.Add(p);
+                combo_port_received.Items.Add(p);
+            }
+            combo_port_send.SelectedIndex = 0;
+            combo_port_received.SelectedIndex = 1;
         }
 
         private void MainFormFormClosing(object sender, FormClosingEventArgs e)
         {
-            serialPort1.Close();
+            serial_port_send.Close();
+            serial_port_received.Close();
         }
 
         //-----Отправка сообщения-----
@@ -37,8 +45,6 @@ namespace radio_nrf
         private void ButtonSendClick(object sender, EventArgs e)
         {
             Send_Mail();
-            //Thread.Sleep(500);
-            //serialPort1.Close();
         }
 
         private void MailKeyDown(object sender, KeyEventArgs e)
@@ -53,54 +59,111 @@ namespace radio_nrf
         private void Send_Mail()
         {
             if (mail.Text != "")
-            {
-                serialPort1.Write(mail.Text);
-                richTextBox1.Clear();
-            }
+                serial_port_send.Write(mail.Text);
             mail.Clear();
         }
-        
-        //-----------------------------
+
+        //----------------------------
 
         //-----Получение сообщения-----
+
+        private void RichTextBox1TextChanged(object sender, EventArgs e)
+        {
+            richTextBox1.SelectionStart = richTextBox1.Text.Length;
+            richTextBox1.ScrollToCaret();
+        }
 
         private void SerialPortDataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             Thread.Sleep(50);
-            data = serialPort1.ReadExisting();
+            _data = serial_port_received.ReadExisting();
             Thread.Sleep(50);
             // Привлечение делегата на потоке UI, и отправка данных, которые
             // были приняты привлеченным методом.
-            // ---- Метод "si_DataReceived" будет выполнен в потоке UI,
-            // который позволит заполнить текстовое поле TextBox.sss
-            BeginInvoke(new SetTextDeleg(SiDataReceived), new object[] { data });
+            // ---- Метод "si_dataReceived" будет выполнен в потоке UI,
+            // который позволит заполнить текстовое поле TextBox
+            BeginInvoke(new SetTextDeleg(SiDataReceived), new object[] { _data });
         }
 
-        private void SiDataReceived(string data)
+        private void SiDataReceived(string _data)
         {
-            richTextBox1.Text += data;
+            richTextBox1.Text += _data;
         }
 
         //-----------------------------
 
-        private void PortSelection(object sender, EventArgs e)
-        {
-            if (serialPort1.IsOpen)
-                serialPort1.Close();
-            mail.Clear();
-            richTextBox1.Clear();
-            serialPort1.PortName = combo_port.SelectedItem.ToString(); //Указываем наш порт
-            serialPort1.BaudRate = 9600; //указываем скорость.
-            serialPort1.DataBits = 8;
-            serialPort1.Parity = Parity.None;
-            serialPort1.Handshake = Handshake.None;
-            serialPort1.Open();
-        }
+        //-----Настройка-----
 
         private void ButtonClearClick(object sender, EventArgs e)
         {
             richTextBox1.Clear();
             mail.Clear();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void combo_port_send_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (serial_port_send.IsOpen)
+                serial_port_send.Close();
+            mail.Clear();
+            string select_item = combo_port_send.SelectedItem.ToString();
+            serial_port_send.PortName = select_item; //Указываем наш порт
+            serial_port_send.BaudRate = 9600; //указываем скорость
+            serial_port_send.DataBits = 8;
+            serial_port_send.Parity = Parity.None;
+            serial_port_send.Handshake = Handshake.None;
+            try
+            {
+                if (combo_port_received.SelectedItem.ToString() == select_item)
+                {
+                    serial_port_received.Close();
+                    for (int i = 0; i < combo_port_received.Items.Count; i++)
+                        if (combo_port_received.Items[i].ToString() != select_item)
+                        {
+                            combo_port_received.SelectedIndex = i;
+                            break;
+                        }
+                }
+            }
+            catch (System.NullReferenceException)
+            {
+
+            }
+            serial_port_send.Open();
+        }
+
+        private void combo_port_received_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (serial_port_received.IsOpen)
+                serial_port_received.Close();
+            richTextBox1.Clear();
+            string select_item = combo_port_received.SelectedItem.ToString();
+            serial_port_received.PortName = select_item; //Указываем наш порт
+            serial_port_received.BaudRate = 9600; //указываем скорость
+            serial_port_received.DataBits = 8;
+            serial_port_received.Parity = Parity.None;
+            serial_port_received.Handshake = Handshake.None;
+            if (combo_port_send.SelectedItem.ToString() == select_item)
+            {
+                serial_port_send.Close();
+                for (int i = 0; i < combo_port_send.Items.Count; i++)
+                    if (combo_port_send.Items[i].ToString() != select_item)
+                    {
+                        combo_port_send.SelectedIndex = i;
+                        break;
+                    }
+            }
+            serial_port_received.Open();
+        }
+
+        //-------------------
+        //Логи в файл
+        //Отправка - COM3
+        //Прием - COM3
+
     }
 }
