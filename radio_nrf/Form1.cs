@@ -30,6 +30,14 @@ namespace radio_nrf
                 combo_port_send.Items.Add(p);
                 combo_port_received.Items.Add(p);
             }
+            serial_port_send.BaudRate = 9600; //указываем скорость
+            serial_port_received.BaudRate = 9600; //указываем скорость
+            serial_port_send.Parity = Parity.None;
+            serial_port_received.Parity = Parity.None;
+            serial_port_send.Handshake = Handshake.None;
+            serial_port_received.Handshake = Handshake.None;
+            serial_port_send.DataBits = 8;
+            serial_port_received.DataBits = 8;
             combo_port_send.SelectedIndex = 0;
             combo_port_received.SelectedIndex = 1;
         }
@@ -100,9 +108,17 @@ namespace radio_nrf
             mail.Clear();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void ButtonChangeClick(object sender, EventArgs e)
         {
-
+            string cs = combo_port_send.SelectedItem.ToString();
+            string cr = combo_port_received.SelectedItem.ToString();
+            for(int i = 0; i < combo_port_send.Items.Count; i++)
+            {
+                if (combo_port_received.Items[i].ToString() == cs)
+                    combo_port_received.SelectedIndex = i;
+                if (combo_port_send.Items[i].ToString() == cr)
+                    combo_port_send.SelectedIndex = i;
+            }
         }
 
         private void combo_port_send_SelectedIndexChanged(object sender, EventArgs e)
@@ -111,11 +127,7 @@ namespace radio_nrf
                 serial_port_send.Close();
             mail.Clear();
             string select_item = combo_port_send.SelectedItem.ToString();
-            serial_port_send.PortName = select_item; //Указываем наш порт
-            serial_port_send.BaudRate = 9600; //указываем скорость
-            serial_port_send.DataBits = 8;
-            serial_port_send.Parity = Parity.None;
-            serial_port_send.Handshake = Handshake.None;
+            serial_port_send.PortName = select_item;
             try
             {
                 if (combo_port_received.SelectedItem.ToString() == select_item)
@@ -129,9 +141,9 @@ namespace radio_nrf
                         }
                 }
             }
-            catch (System.NullReferenceException)
+            catch (NullReferenceException)
             {
-
+                //говнокод блядь
             }
             serial_port_send.Open();
         }
@@ -142,11 +154,7 @@ namespace radio_nrf
                 serial_port_received.Close();
             richTextBox1.Clear();
             string select_item = combo_port_received.SelectedItem.ToString();
-            serial_port_received.PortName = select_item; //Указываем наш порт
-            serial_port_received.BaudRate = 9600; //указываем скорость
-            serial_port_received.DataBits = 8;
-            serial_port_received.Parity = Parity.None;
-            serial_port_received.Handshake = Handshake.None;
+            serial_port_received.PortName = select_item;
             if (combo_port_send.SelectedItem.ToString() == select_item)
             {
                 serial_port_send.Close();

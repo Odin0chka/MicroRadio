@@ -147,7 +147,7 @@
             this.change.TabIndex = 7;
             this.change.Text = "Сменить";
             this.change.UseVisualStyleBackColor = true;
-            this.change.Click += new System.EventHandler(this.button1_Click);
+            this.change.Click += new System.EventHandler(this.ButtonChangeClick);
             // 
             // serial_port_received
             // 
